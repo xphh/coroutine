@@ -25,15 +25,17 @@ int main()
 	myctx ctx2 = {2};
 	myctx ctx3 = {3};
 
-	int co1 = coroutine_new(env, cofunc, &ctx1);
+	int i;
+	int co1, co2, co3;
+
+	co1 = coroutine_new(env, cofunc, &ctx1);
 	printf("coroutine_new %d\n", co1);
-	int co2 = coroutine_new(env, cofunc, &ctx2);
+	co2 = coroutine_new(env, cofunc, &ctx2);
 	printf("coroutine_new %d\n", co2);
-	int co3 = coroutine_new(env, cofunc, &ctx3);
+	co3 = coroutine_new(env, cofunc, &ctx3);
 	printf("coroutine_new %d\n", co3);
 
-	int i;
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 5; i++)
 	{
 		coroutine_resume(env, co1);
 		coroutine_resume(env, co2);
@@ -41,6 +43,8 @@ int main()
 	}
 
 	coroutine_uninit(env);
+
+	getchar();
 
 	return 0;
 }
