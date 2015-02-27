@@ -35,7 +35,7 @@ int main()
 	co3 = coroutine_new(env, cofunc, &ctx3);
 	printf("coroutine_new %d\n", co3);
 
-	for (i = 0; i < 5; i++)
+	for (i = 0; i < 10; i++)
 	{
 		coroutine_resume(env, co1);
 		coroutine_resume(env, co2);

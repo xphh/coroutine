@@ -36,6 +36,7 @@ struct coroutine
 	int stacksize;
 	ucontext_t uctx;
 #endif
+	struct coroutine *main;
 };
 
 typedef struct coroutine * cort_t;
@@ -52,6 +53,9 @@ static void _proxyfunc(uint32_t low32, uint32_t hi32)
 #endif
 	co->func(co->env, co->context);
 	co->state = COROUTINE_END;
+#ifdef WIN32
+	SwitchToFiber(co->main->fiber);
+#endif
 }
 
 static cort_t co_new(coenv_t env, cort_t main, coroutine_func func, void *context)
@@ -61,6 +65,7 @@ static cort_t co_new(coenv_t env, cort_t main, coroutine_func func, void *contex
 	co->env = env;
 	co->func = func;
 	co->context = context;
+	co->main = main;
 
 #ifdef WIN32
 	co->fiber = CreateFiber(0, _proxyfunc, co);
@@ -196,7 +201,7 @@ int coroutine_new(coenv_t env, coroutine_func func, void *context)
 
 void coroutine_resume(coenv_t env, int id)
 {
-	if (0 <= id && id < env->nco)
+	if (0 <= id && id < env->cap)
 	{
 		cort_t co = env->aco[id];
 		if (co && co->state == COROUTINE_SUSPEND)
@@ -219,7 +224,7 @@ void coroutine_resume(coenv_t env, int id)
 void coroutine_yield(coenv_t env)
 {
 	int id = env->running;
-	if (0 <= id && id < env->nco)
+	if (0 <= id && id < env->cap)
 	{
 		cort_t co = env->aco[id];
 		if (co && co->state == COROUTINE_RUNNING)
