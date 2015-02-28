@@ -7,6 +7,11 @@
 #include "coroutine.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __APPLE__
+#define _XOPEN_SOURCE
+#endif
+
 #include <ucontext.h>
 #include <stddef.h>
 #include <string.h>
